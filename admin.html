@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Police Admin Panel</title>
+<style>
+body{
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    margin:0;
+    color:white;
+}
+
+.container{
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    padding:30px;
+    border-radius:15px;
+    width:420px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:none;
+}
+
+input[type="file"]{
+    background:white;
+    color:black;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#00c6ff;
+    border:none;
+    border-radius:8px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#0072ff;
+}
+
+.success{
+    margin-top:10px;
+    color:#00ffae;
+    text-align:center;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>🚔 Police Officer & Missing Case Portal</h2>
+
+<!-- Officer Details -->
+<input id="officerName" placeholder="Officer Name">
+<input id="designation" placeholder="Designation">
+<input id="code" placeholder="Unique Police Code">
+<input id="mobile" placeholder="Mobile Number">
+
+<hr>
+
+<!-- Missing Person Details -->
+<input id="missingName" placeholder="Missing Person Name">
+<input id="missingAge" placeholder="Missing Person Age">
+<input type="file" id="photo" accept="image/*">
+
+<button onclick="verifyAndSave()">Verify & Save Case</button>
+
+<div class="success" id="msg"></div>
+</div>
+
+<script>
+function verifyAndSave(){
+
+    const officerName = document.getElementById("officerName").value.trim();
+    const designation = document.getElementById("designation").value.trim();
+    const code = document.getElementById("code").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+
+    const missingName = document.getElementById("missingName").value.trim();
+    const missingAge = document.getElementById("missingAge").value.trim();
+    const photoInput = document.getElementById("photo");
+
+    if(!officerName || !designation || !code || !mobile || !missingName || !missingAge){
+        alert("Please fill all fields");
+        return;
+    }
+
+    if(code.length < 4 || mobile.length < 10){
+        alert("Invalid verification details");
+        return;
+    }
+
+    const file = photoInput.files[0];
+    let photoName = file ? file.name : "No Photo Uploaded";
+
+    const caseData = {
+        officerName,
+        designation,
+        code,
+        mobile,
+        missingName,
+        missingAge,
+        photoName,
+        createdAt: new Date().toLocaleString()
+    };
+
+    // Save to localStorage (accumulate cases)
+    let existingCases = JSON.parse(localStorage.getItem("missingCases")) || [];
+    existingCases.push(caseData);
+    localStorage.setItem("missingCases", JSON.stringify(existingCases));
+
+    // Create downloadable log file
+    const fileContent = 
+`Police Missing Case Log
+-------------------------
+Officer Name: ${officerName}
+Designation: ${designation}
+Unique Code: ${code}
+Mobile: ${mobile}
+
+Missing Person Name: ${missingName}
+Age: ${missingAge}
+Photo File: ${photoName}
+
+Case Created At: ${caseData.createdAt}
+`;
+
+    const blob = new Blob([fileContent], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Case_${code}_${missingName}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    document.getElementById("msg").innerText =
+        "Case Saved Successfully ✅ Log Downloaded";
+
+    setTimeout(()=>{
+        window.location.reload();
+    },2000);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RoadWatch - Missing Alert System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        img {
+            width: 150px;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .alert-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .toggle-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        #aiOutput {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffe6e6;
+            border-radius: 6px;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚨 RoadWatch - Missing Alert System</h1>
+
+    <!-- Dropdown -->
+    <label>Select Area:</label>
+    <select id="areaSelect">
+        <option>Ernakulam</option>
+        <option>Thrissur</option>
+    </select>
+
+    <br><br>
+
+    <!-- Toggle Button -->
+    <button class="toggle-btn" onclick="toggleRoadMode()">
+        I Am On The Road
+    </button>
+
+    <div id="roadStatus"></div>
+
+    <!-- Missing Person Card -->
+    <div class="card" id="personCard">
+        <img id="personPhoto" src="">
+        <h3 id="personName"></h3>
+        <p id="personAge"></p>
+        <p id="personLastSeen"></p>
+
+        <button class="alert-btn" onclick="generateAlert()">
+            Generate Worker Alert
+        </button>
+    </div>
+
+    <!-- AI Output Box -->
+    <div id="aiOutput">
+        AI alert message will appear here...
+    </div>
+
+<script>
+
+    // Hardcoded Missing People Data
+    const missingPeople = [
+        {
+            name: "Rahul Kumar",
+            age: 14,
+            lastSeen: "Near Ernakulam Bus Stand",
+            area: "Ernakulam",
+            photo: "https://via.placeholder.com/150"
+        },
+        {
+            name: "Anjali Nair",
+            age: 17,
+            lastSeen: "Thrissur Railway Station",
+            area: "Thrissur",
+            photo: "https://via.placeholder.com/150"
+        }
+    ];
+
+    let roadMode = false;
+
+    function toggleRoadMode() {
+        roadMode = !roadMode;
+        document.getElementById("roadStatus").innerText =
+            roadMode ? "🟢 Road Mode Activated" : "🔴 Road Mode Off";
+    }
+
+    function loadPerson() {
+        const selectedArea = document.getElementById("areaSelect").value;
+
+        const person = missingPeople.find(p => p.area === selectedArea);
+
+        document.getElementById("personPhoto").src = person.photo;
+        document.getElementById("personName").innerText = person.name;
+        document.getElementById("personAge").innerText = "Age: " + person.age;
+        document.getElementById("personLastSeen").innerText = "Last Seen: " + person.lastSeen;
+    }
+
+    function generateAlert() {
+        if (!roadMode) {
+            alert("Activate Road Mode first!");
+            return;
+        }
+
+        const selectedArea = document.getElementById("areaSelect").value;
+
+        const alertMessage =
+            "🚨 HIGH PRIORITY ALERT for " + selectedArea + " Workers:\n\n" +
+            "Be alert for the missing person shown above.\n" +
+            "Check bus stands, railway stations and crowded areas.\n\n" +
+            "If spotted, report immediately.";
+
+        document.getElementById("aiOutput").innerText = alertMessage;
+    }
+
+    document.getElementById("areaSelect").addEventListener("change", loadPerson);
+
+    loadPerson();
+
+</script>
+
+</body>
+</html>
