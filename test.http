@@ -1,0 +1,11 @@
+POST http://127.0.0.1:5000/add-case
+Content-Type: application/json
+
+{
+  "officerName": "Irene",
+  "designation": "Inspector",
+  "code": "KL01",
+  "mobile": "9999999999",
+  "missingName": "Rahul",
+  "missingAge": 12
+}

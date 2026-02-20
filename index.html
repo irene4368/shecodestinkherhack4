@@ -1,156 +1,726 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RoadWatch - Missing Alert System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadWatch — Missing Persons Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a0f1e;
+    --dark: #0d1526;
+    --panel: #111827;
+    --card: #151e30;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --text: #e8eaf0;
+    --muted: #8892a4;
+    --danger: #ff4757;
+    --success: #2ed573;
+    --font-head: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; overflow:hidden; }
+  body { font-family:var(--font-body); background:var(--navy); color:var(--text); }
 
-        h1 {
-            color: #333;
-        }
+  .bg-grid {
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size:60px 60px;
+  }
+  .bg-glow { position:fixed; width:600px; height:600px; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+  .bg-glow-1 { background:rgba(0,212,255,0.06); top:-200px; left:-200px; }
+  .bg-glow-2 { background:rgba(255,107,53,0.05); bottom:-200px; right:-200px; }
 
-        .card {
-            background: white;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+  .page { position:fixed; inset:0; display:none; opacity:0; transition:opacity 0.4s ease; }
+  .page.active { display:flex; opacity:1; }
 
-        img {
-            width: 150px;
-            border-radius: 6px;
-        }
+  /* LANDING */
+  #page-landing { flex-direction:column; align-items:center; justify-content:center; }
+  .landing-inner { position:relative; z-index:1; text-align:center; animation:fadeUp 0.8s ease both; }
+  .badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2);
+    border-radius:100px; padding:6px 16px; font-size:11px; font-weight:600;
+    letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:28px;
+  }
+  .badge::before { content:'●'; animation:pulse 2s ease infinite; }
+  .landing-title { font-family:var(--font-head); font-size:clamp(72px,12vw,130px); line-height:0.9; letter-spacing:2px; color:#fff; margin-bottom:8px; }
+  .landing-title span { color:var(--accent); display:block; }
+  .landing-sub { font-size:15px; color:var(--muted); font-weight:300; margin-bottom:56px; letter-spacing:0.5px; }
+  .landing-cards { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+  .landing-card {
+    width:220px; background:var(--card); border:1px solid var(--border); border-radius:20px;
+    padding:32px 24px; cursor:pointer; transition:all 0.3s ease; position:relative; overflow:hidden;
+  }
+  .landing-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,transparent,rgba(255,255,255,0.03)); opacity:0; transition:opacity 0.3s; }
+  .landing-card:hover::before { opacity:1; }
+  .landing-card:hover { transform:translateY(-6px); border-color:var(--accent); box-shadow:0 20px 60px rgba(0,212,255,0.1); }
+  .lcard-icon { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; margin:0 auto 20px; }
+  .lcard-icon.blue { background:rgba(0,212,255,0.12); }
+  .lcard-icon.orange { background:rgba(255,107,53,0.12); }
+  .lcard-title { font-family:var(--font-head); font-size:22px; letter-spacing:1px; margin-bottom:8px; color:#fff; }
+  .lcard-desc { font-size:12px; color:var(--muted); line-height:1.6; }
 
-        button {
-            padding: 10px 15px;
-            margin-top: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
+  /* AUTH */
+  #page-auth { flex-direction:row; }
+  .auth-left { flex:1; display:flex; flex-direction:column; justify-content:center; padding:60px; position:relative; z-index:1; }
+  .auth-right { width:420px; background:var(--panel); border-left:1px solid var(--border); display:flex; flex-direction:column; justify-content:center; padding:60px 48px; overflow-y:auto; position:relative; z-index:1; }
+  .back-btn { display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); cursor:pointer; margin-bottom:48px; transition:color 0.2s; text-transform:uppercase; letter-spacing:1px; font-weight:500; }
+  .back-btn:hover { color:var(--accent); }
+  .auth-headline { font-family:var(--font-head); font-size:clamp(48px,6vw,80px); line-height:0.95; margin-bottom:16px; }
+  .auth-headline em { color:var(--accent); font-style:normal; }
+  .auth-desc { font-size:14px; color:var(--muted); line-height:1.7; max-width:380px; }
+  .stat-row { display:flex; gap:40px; margin-top:60px; }
+  .stat-num { font-family:var(--font-head); font-size:42px; color:#fff; letter-spacing:1px; }
+  .stat-num span { color:var(--accent); }
+  .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
+  .form-title { font-family:var(--font-head); font-size:28px; letter-spacing:1px; margin-bottom:6px; }
+  .form-subtitle { font-size:13px; color:var(--muted); margin-bottom:32px; }
+  .tab-row { display:flex; background:rgba(255,255,255,0.04); border-radius:10px; padding:4px; margin-bottom:28px; }
+  .tab-btn { flex:1; padding:10px; border:none; border-radius:8px; background:transparent; color:var(--muted); font-family:var(--font-body); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.25s; }
+  .tab-btn.active { background:var(--accent); color:var(--navy); font-weight:600; }
+  .field-group { margin-bottom:16px; }
+  .field-label { font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; display:block; }
+  .field-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px; color:var(--text); font-family:var(--font-body); font-size:14px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+  .field-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,212,255,0.1); }
+  .field-input::placeholder { color:rgba(255,255,255,0.2); }
+  .field-input[readonly] { opacity:0.6; cursor:default; }
+  .fields-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .fields-grid .field-group { margin-bottom:0; }
+  .submit-btn { width:100%; padding:14px; border:none; border-radius:12px; background:var(--accent); color:var(--navy); font-family:var(--font-body); font-size:14px; font-weight:700; cursor:pointer; letter-spacing:0.5px; margin-top:8px; transition:all 0.25s; }
+  .submit-btn:hover { background:#33ddff; box-shadow:0 8px 30px rgba(0,212,255,0.25); transform:translateY(-1px); }
+  .form-note { font-size:11px; color:var(--muted); text-align:center; margin-top:16px; line-height:1.6; }
 
-        .alert-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:20px 40px; border-bottom:1px solid var(--border); background:var(--panel); position:relative; z-index:10; flex-shrink:0; }
+  .topbar-brand { font-family:var(--font-head); font-size:22px; letter-spacing:2px; color:var(--accent); }
+  .topbar-user { display:flex; align-items:center; gap:12px; }
+  .user-avatar { width:36px; height:36px; background:linear-gradient(135deg,var(--accent),#0066cc); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--navy); }
+  .user-name { font-size:13px; font-weight:500; }
+  .user-role { font-size:11px; color:var(--muted); }
+  .logout-btn { padding:8px 16px; background:rgba(255,71,87,0.1); border:1px solid rgba(255,71,87,0.2); border-radius:8px; color:var(--danger); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; letter-spacing:0.5px; }
+  .logout-btn:hover { background:var(--danger); color:white; }
 
-        .toggle-btn {
-            background-color: #3498db;
-            color: white;
-        }
+  /* OFFICER PAGE */
+  #page-officer { flex-direction:column; }
+  .officer-body { flex:1; overflow-y:auto; padding:40px; position:relative; z-index:1; }
+  .page-heading { font-family:var(--font-head); font-size:42px; letter-spacing:1px; margin-bottom:4px; }
+  .page-heading span { color:var(--accent); }
+  .page-sub { font-size:13px; color:var(--muted); margin-bottom:40px; }
+  .case-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; max-width:960px; }
+  .form-section { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:32px; }
+  .section-tag { display:inline-flex; align-items:center; gap:8px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:5px 12px; border-radius:6px; margin-bottom:20px; }
+  .section-tag.blue { background:rgba(0,212,255,0.1); color:var(--accent); }
+  .section-tag.orange { background:rgba(255,107,53,0.1); color:var(--accent2); }
+  .section-title { font-family:var(--font-head); font-size:22px; letter-spacing:1px; margin-bottom:24px; color:#fff; }
+  .photo-drop { border:2px dashed rgba(255,255,255,0.1); border-radius:12px; padding:28px 20px; text-align:center; cursor:pointer; transition:all 0.25s; margin-bottom:16px; position:relative; }
+  .photo-drop:hover { border-color:var(--accent); background:rgba(0,212,255,0.03); }
+  .photo-drop input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .photo-drop-icon { font-size:28px; margin-bottom:6px; }
+  .photo-drop-text { font-size:12px; color:var(--muted); }
+  .photo-drop-text strong { color:var(--accent); }
+  #preview-img { width:100%; border-radius:10px; display:none; margin-bottom:12px; max-height:160px; object-fit:cover; }
+  select.field-input { appearance:none; cursor:pointer; }
+  select.field-input option { background:var(--panel); }
+  .save-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--accent),#0099cc); color:var(--navy); font-family:var(--font-body); font-size:15px; font-weight:700; cursor:pointer; transition:all 0.3s; margin-top:16px; }
+  .save-btn:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,212,255,0.3); }
+  .divider { height:1px; background:var(--border); margin:32px 0; }
+  .cases-section { max-width:960px; margin-top:8px; }
+  .case-list-item { display:flex; align-items:center; gap:16px; padding:16px 20px; background:var(--card); border:1px solid var(--border); border-radius:14px; margin-bottom:10px; animation:fadeUp 0.3s ease both; transition:border-color 0.2s; }
+  .case-list-item:hover { border-color:rgba(0,212,255,0.2); }
+  .cli-avatar { width:44px; height:44px; background:linear-gradient(135deg,rgba(255,107,53,0.2),rgba(255,107,53,0.05)); border:1px solid rgba(255,107,53,0.2); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .cli-info { flex:1; }
+  .cli-name { font-weight:600; font-size:14px; }
+  .cli-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .cli-badge { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; border-radius:6px; background:rgba(255,71,87,0.1); color:var(--danger); }
 
-        #aiOutput {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #ffe6e6;
-            border-radius: 6px;
-            min-height: 50px;
-        }
-    </style>
+  /* PUBLIC PAGE */
+  #page-public { flex-direction:column; }
+  .public-body { flex:1; overflow-y:auto; padding:40px; position:relative; z-index:1; }
+  .filter-bar { display:flex; gap:12px; align-items:center; margin-bottom:36px; flex-wrap:wrap; }
+  .search-wrap { position:relative; flex:1; min-width:200px; }
+  .search-wrap span { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; opacity:0.4; }
+  .search-input { width:100%; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px 12px 42px; color:var(--text); font-family:var(--font-body); font-size:14px; outline:none; transition:border-color 0.2s; }
+  .search-input:focus { border-color:var(--accent2); }
+  .search-input::placeholder { color:var(--muted); }
+  .filter-select { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 16px; color:var(--text); font-family:var(--font-body); font-size:13px; outline:none; cursor:pointer; appearance:none; min-width:160px; }
+  .filter-select option { background:var(--panel); }
+  .cases-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+  .case-card { background:var(--card); border:1px solid var(--border); border-radius:18px; overflow:hidden; transition:all 0.3s; animation:fadeUp 0.4s ease both; }
+  .case-card:hover { transform:translateY(-4px); border-color:rgba(255,107,53,0.3); box-shadow:0 16px 48px rgba(0,0,0,0.3); }
+  .case-card-img { width:100%; height:180px; object-fit:cover; display:block; }
+  .case-card-placeholder { width:100%; height:180px; background:linear-gradient(135deg,#1a2640,#0d1526); display:flex; align-items:center; justify-content:center; font-size:64px; color:rgba(255,255,255,0.05); }
+  .case-card-body { padding:20px; }
+  .case-status { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 10px; border-radius:100px; background:rgba(255,71,87,0.12); color:var(--danger); margin-bottom:12px; }
+  .case-status::before { content:'●'; font-size:8px; animation:pulse 1.5s ease infinite; }
+  .case-name { font-family:var(--font-head); font-size:22px; letter-spacing:0.5px; color:#fff; margin-bottom:4px; }
+  .case-meta { font-size:12px; color:var(--muted); margin-bottom:16px; line-height:1.7; }
+  .case-meta strong { color:var(--text); }
+  .case-footer { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border); }
+  .case-district { font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--accent2); }
+  .case-officer { font-size:11px; color:var(--muted); }
+  .empty-state { text-align:center; padding:80px 20px; color:var(--muted); }
+  .empty-state .icon { font-size:60px; margin-bottom:16px; opacity:0.4; }
+  .empty-state p { font-size:14px; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:32px; right:32px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 20px; display:flex; align-items:center; gap:12px; font-size:13px; font-weight:500; z-index:1000; transform:translateY(80px); opacity:0; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); pointer-events:none; min-width:260px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.success { border-color:rgba(46,213,115,0.3); }
+  .toast.error { border-color:rgba(255,71,87,0.3); }
+  .toast-icon { font-size:20px; flex-shrink:0; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+
+  @media(max-width:768px) {
+    #page-auth { flex-direction:column; }
+    .auth-left { display:none; }
+    .auth-right { width:100%; padding:40px 28px; }
+    .case-form-grid { grid-template-columns:1fr; }
+    .topbar { padding:16px 20px; }
+    .officer-body,.public-body { padding:24px; }
+    .fields-grid { grid-template-columns:1fr; }
+  }
+</style>
 </head>
 <body>
 
-    <h1>🚨 RoadWatch - Missing Alert System</h1>
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
 
-    <!-- Dropdown -->
-    <label>Select Area:</label>
-    <select id="areaSelect">
-        <option>Ernakulam</option>
-        <option>Thrissur</option>
-    </select>
+<!-- LANDING PAGE -->
+<div class="page active" id="page-landing">
+  <div class="landing-inner">
+    <div class="badge">🛡 Integrated Missing Persons System</div>
+    <h1 class="landing-title">ROAD<span>WATCH</span></h1>
+    <p class="landing-sub">Kerala District-wide Missing Persons Database &amp; Alert Platform</p>
+    <div class="landing-cards">
+      <div class="landing-card" onclick="showAuth()">
+        <div class="lcard-icon blue">👮</div>
+        <div class="lcard-title">OFFICER PORTAL</div>
+        <div class="lcard-desc">Register cases, log missing persons, manage district records</div>
+      </div>
+      <div class="landing-card" onclick="gotoPublic()">
+        <div class="lcard-icon orange">🔍</div>
+        <div class="lcard-title">PUBLIC SEARCH</div>
+        <div class="lcard-desc">Search missing persons across all Kerala districts</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <br><br>
-
-    <!-- Toggle Button -->
-    <button class="toggle-btn" onclick="toggleRoadMode()">
-        I Am On The Road
-    </button>
-
-    <div id="roadStatus"></div>
-
-    <!-- Missing Person Card -->
-    <div class="card" id="personCard">
-        <img id="personPhoto" src="">
-        <h3 id="personName"></h3>
-        <p id="personAge"></p>
-        <p id="personLastSeen"></p>
-
-        <button class="alert-btn" onclick="generateAlert()">
-            Generate Worker Alert
-        </button>
+<!-- AUTH PAGE -->
+<div class="page" id="page-auth">
+  <div class="auth-left">
+    <span class="back-btn" onclick="showPage('page-landing')">← Back</span>
+    <h2 class="auth-headline">OFFICER<br><em>PORTAL</em></h2>
+    <p class="auth-desc">Secure access for registered Kerala Police officers. Login with your credentials or create a new account to start filing missing person cases.</p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num" id="stat-cases">0</div>
+        <div class="stat-label">Cases Filed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">14<span>+</span></div>
+        <div class="stat-label">Districts</div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</button>
     </div>
 
-    <!-- AI Output Box -->
-    <div id="aiOutput">
-        AI alert message will appear here...
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="form-title">Welcome back</div>
+      <div class="form-subtitle">Sign in to your officer account</div>
+      <div class="field-group">
+        <label class="field-label">Police Code</label>
+        <input class="field-input" id="login-code" placeholder="Your unique police code">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Mobile Number</label>
+        <input class="field-input" id="login-mobile" placeholder="10-digit mobile number" maxlength="10" type="tel">
+      </div>
+      <button class="submit-btn" onclick="handleLogin()">Sign In →</button>
+      <p class="form-note">No account yet? Switch to Register above</p>
     </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none">
+      <div class="form-title">Create Account</div>
+      <div class="form-subtitle">Register as a new Kerala Police officer</div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label class="field-label">Full Name</label>
+          <input class="field-input" id="reg-name" placeholder="Officer name">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Designation</label>
+          <input class="field-input" id="reg-designation" placeholder="e.g. Constable">
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:12px">
+        <label class="field-label">Unique Police Code</label>
+        <input class="field-input" id="reg-code" placeholder="Min. 4 characters">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Mobile Number</label>
+        <input class="field-input" id="reg-mobile" placeholder="10-digit number" maxlength="10" type="tel">
+      </div>
+      <div class="field-group">
+        <label class="field-label">District</label>
+        <select class="field-input" id="reg-district">
+          <option value="">Select your district</option>
+          <option>Thiruvananthapuram</option><option>Kollam</option><option>Pathanamthitta</option>
+          <option>Alappuzha</option><option>Kottayam</option><option>Idukki</option>
+          <option>Ernakulam</option><option>Thrissur</option><option>Palakkad</option>
+          <option>Malappuram</option><option>Kozhikode</option><option>Wayanad</option>
+          <option>Kannur</option><option>Kasaragod</option>
+        </select>
+      </div>
+      <button class="submit-btn" onclick="handleRegister()">Create Account →</button>
+      <p class="form-note">Already registered? Switch to Login above</p>
+    </div>
+  </div>
+</div>
+
+<!-- OFFICER PAGE -->
+<div class="page" id="page-officer">
+  <div class="topbar">
+    <div class="topbar-brand">🚔 ROADWATCH</div>
+    <div class="topbar-user">
+      <div>
+        <div class="user-name" id="officer-display-name">Officer</div>
+        <div class="user-role" id="officer-display-role">—</div>
+      </div>
+      <div class="user-avatar" id="officer-avatar">O</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="officer-body">
+    <div class="page-heading">FILE A <span>NEW CASE</span></div>
+    <div class="page-sub">All records are saved to the Kerala Police database</div>
+
+    <div class="case-form-grid">
+      <!-- Officer Info -->
+      <div class="form-section">
+        <div class="section-tag blue">👮 Officer Details</div>
+        <div class="section-title">Your Information</div>
+        <div class="field-group">
+          <label class="field-label">Officer Name</label>
+          <input class="field-input" id="of-name" readonly>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Designation</label>
+          <input class="field-input" id="of-designation" readonly>
+        </div>
+        <div class="fields-grid">
+          <div class="field-group">
+            <label class="field-label">Police Code</label>
+            <input class="field-input" id="of-code" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Mobile</label>
+            <input class="field-input" id="of-mobile" readonly>
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:4px">
+          <label class="field-label">Filing District</label>
+          <select class="field-input" id="of-district">
+            <option value="">Select district</option>
+            <option>Thiruvananthapuram</option><option>Kollam</option><option>Pathanamthitta</option>
+            <option>Alappuzha</option><option>Kottayam</option><option>Idukki</option>
+            <option>Ernakulam</option><option>Thrissur</option><option>Palakkad</option>
+            <option>Malappuram</option><option>Kozhikode</option><option>Wayanad</option>
+            <option>Kannur</option><option>Kasaragod</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Missing Person Info -->
+      <div class="form-section">
+        <div class="section-tag orange">🔍 Missing Person</div>
+        <div class="section-title">Case Details</div>
+        <img id="preview-img" src="" alt="Preview">
+        <div class="photo-drop">
+          <input type="file" id="photo-input" accept="image/*" onchange="previewPhoto(this)">
+          <div class="photo-drop-icon">📸</div>
+          <div class="photo-drop-text"><strong>Click to upload</strong> photo</div>
+        </div>
+        <div class="fields-grid">
+          <div class="field-group">
+            <label class="field-label">Full Name</label>
+            <input class="field-input" id="missing-name" placeholder="Name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Age</label>
+            <input class="field-input" id="missing-age" type="number" placeholder="Age" min="0" max="120">
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:12px">
+          <label class="field-label">Last Seen Location</label>
+          <input class="field-input" id="missing-location" placeholder="Area / landmark">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <input class="field-input" id="missing-desc" placeholder="Clothing, features, etc.">
+        </div>
+        <button class="save-btn" onclick="saveCase()">💾 Save Case to Database</button>
+      </div>
+    </div>
+
+    <!-- Filed Cases -->
+    <div class="cases-section">
+      <div class="divider"></div>
+      <div class="page-heading" style="font-size:28px">YOUR <span>FILED CASES</span></div>
+      <div class="page-sub" style="margin-bottom:20px">Cases you have filed</div>
+      <div id="officer-case-list">
+        <div class="empty-state"><div class="icon">📋</div><p>No cases filed yet</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLIC PAGE -->
+<div class="page" id="page-public">
+  <div class="topbar" style="border-bottom:1px solid var(--border)">
+    <div class="topbar-brand" style="color:var(--accent2)">🔍 ROADWATCH — MISSING PERSONS</div>
+    <button class="logout-btn" style="border-color:rgba(255,255,255,0.1);color:var(--muted)" onclick="showPage('page-landing')">← Home</button>
+  </div>
+  <div class="public-body">
+    <div class="page-heading" style="margin-bottom:4px">MISSING <span style="color:var(--accent2)">PERSONS</span></div>
+    <div class="page-sub" style="margin-bottom:28px">Kerala District Database — Contact nearest police station if you have information</div>
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <span>🔍</span>
+        <input class="search-input" id="search-input" placeholder="Search by name..." oninput="filterCases()">
+      </div>
+      <select class="filter-select" id="district-filter" onchange="filterCases()">
+        <option value="">All Districts</option>
+        <option>Thiruvananthapuram</option><option>Kollam</option><option>Pathanamthitta</option>
+        <option>Alappuzha</option><option>Kottayam</option><option>Idukki</option>
+        <option>Ernakulam</option><option>Thrissur</option><option>Palakkad</option>
+        <option>Malappuram</option><option>Kozhikode</option><option>Wayanad</option>
+        <option>Kannur</option><option>Kasaragod</option>
+      </select>
+    </div>
+    <div class="cases-grid" id="public-cases-grid">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="icon">📭</div>
+        <p>No missing person records yet.<br>Officers can add cases via the Officer Portal.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon"></span>
+  <span id="toast-msg"></span>
+</div>
 
 <script>
+// ─── State ───────────────────────────────────────────────────
+let currentOfficer = null;
+let allCases  = JSON.parse(localStorage.getItem('rw_cases')    || '[]');
+let officers  = JSON.parse(localStorage.getItem('rw_officers') || '[]');
 
-    // Hardcoded Missing People Data
-    const missingPeople = [
-        {
-            name: "Rahul Kumar",
-            age: 14,
-            lastSeen: "Near Ernakulam Bus Stand",
-            area: "Ernakulam",
-            photo: "https://via.placeholder.com/150"
-        },
-        {
-            name: "Anjali Nair",
-            age: 17,
-            lastSeen: "Thrissur Railway Station",
-            area: "Thrissur",
-            photo: "https://via.placeholder.com/150"
-        }
-    ];
+// ─── Page navigation ─────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  const pg = document.getElementById(id);
+  pg.style.display = 'flex';
+  requestAnimationFrame(() => pg.classList.add('active'));
+}
 
-    let roadMode = false;
+// ─── Toast ───────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent =
+    type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
 
-    function toggleRoadMode() {
-        roadMode = !roadMode;
-        document.getElementById("roadStatus").innerText =
-            roadMode ? "🟢 Road Mode Activated" : "🔴 Road Mode Off";
-    }
+// ─── Storage helpers ─────────────────────────────────────────
+function saveCases()    { localStorage.setItem('rw_cases',    JSON.stringify(allCases));  }
+function saveOfficers() { localStorage.setItem('rw_officers', JSON.stringify(officers));  }
 
-    function loadPerson() {
-        const selectedArea = document.getElementById("areaSelect").value;
+// ─── Landing actions ─────────────────────────────────────────
+function showAuth() {
+  document.getElementById('stat-cases').textContent = allCases.length;
+  switchTab('login');
+  showPage('page-auth');
+}
 
-        const person = missingPeople.find(p => p.area === selectedArea);
+function gotoPublic() {
+  showPage('page-public');
+  filterCases();
+}
 
-        document.getElementById("personPhoto").src = person.photo;
-        document.getElementById("personName").innerText = person.name;
-        document.getElementById("personAge").innerText = "Age: " + person.age;
-        document.getElementById("personLastSeen").innerText = "Last Seen: " + person.lastSeen;
-    }
+function logout() {
+  currentOfficer = null;
+  showPage('page-landing');
+}
 
-    function generateAlert() {
-        if (!roadMode) {
-            alert("Activate Road Mode first!");
-            return;
-        }
+// ─── Tab switching ───────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+}
 
-        const selectedArea = document.getElementById("areaSelect").value;
+// ─── Login ───────────────────────────────────────────────────
+function handleLogin() {
+  const code   = document.getElementById('login-code').value.trim();
+  const mobile = document.getElementById('login-mobile').value.trim();
+  if (!code || !mobile)    { toast('Please fill in all fields', 'error'); return; }
+  if (mobile.length < 10)  { toast('Enter a valid 10-digit number', 'error'); return; }
+  const officer = officers.find(o => o.code === code && o.mobile === mobile);
+  if (!officer)            { toast('Invalid credentials. Please register first.', 'error'); return; }
+  currentOfficer = officer;
+  enterOfficerPortal();
+}
 
-        const alertMessage =
-            "🚨 HIGH PRIORITY ALERT for " + selectedArea + " Workers:\n\n" +
-            "Be alert for the missing person shown above.\n" +
-            "Check bus stands, railway stations and crowded areas.\n\n" +
-            "If spotted, report immediately.";
+// ─── Register ────────────────────────────────────────────────
+function handleRegister() {
+  const name        = document.getElementById('reg-name').value.trim();
+  const designation = document.getElementById('reg-designation').value.trim();
+  const code        = document.getElementById('reg-code').value.trim();
+  const mobile      = document.getElementById('reg-mobile').value.trim();
+  const district    = document.getElementById('reg-district').value;
 
-        document.getElementById("aiOutput").innerText = alertMessage;
-    }
+  if (!name || !designation || !code || !mobile || !district) {
+    toast('Please fill in all fields', 'error'); return;
+  }
+  if (code.length < 4)    { toast('Police code must be at least 4 characters', 'error'); return; }
+  if (mobile.length < 10) { toast('Enter a valid 10-digit number', 'error'); return; }
+  if (officers.find(o => o.code === code)) {
+    toast('This police code is already registered', 'error'); return;
+  }
 
-    document.getElementById("areaSelect").addEventListener("change", loadPerson);
+  const newOfficer = { name, designation, code, mobile, district, createdAt: new Date().toLocaleString() };
+  officers.push(newOfficer);
+  saveOfficers();
+  currentOfficer = newOfficer;
 
-    loadPerson();
+  // Try to POST to Flask backend (silent fail if not running)
+  fetch('http://127.0.0.1:5000/add-case', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...newOfficer, type: 'officer_registration' })
+  }).catch(() => {});
 
+  toast(`Welcome, ${name}! Account created.`, 'success');
+  setTimeout(enterOfficerPortal, 700);
+}
+
+// ─── Enter officer portal ────────────────────────────────────
+function enterOfficerPortal() {
+  const o = currentOfficer;
+  document.getElementById('officer-display-name').textContent = o.name;
+  document.getElementById('officer-display-role').textContent = `${o.designation} · ${o.district}`;
+  document.getElementById('officer-avatar').textContent       = o.name[0].toUpperCase();
+  document.getElementById('of-name').value        = o.name;
+  document.getElementById('of-designation').value = o.designation;
+  document.getElementById('of-code').value        = o.code;
+  document.getElementById('of-mobile').value      = o.mobile;
+
+  // Pre-select officer's district
+  const sel = document.getElementById('of-district');
+  for (let opt of sel.options) {
+    if (opt.value === o.district) { opt.selected = true; break; }
+  }
+
+  renderOfficerCases();
+  showPage('page-officer');
+}
+
+// ─── Photo preview ───────────────────────────────────────────
+function previewPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('preview-img');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── Save case ───────────────────────────────────────────────
+function saveCase() {
+  const missingName = document.getElementById('missing-name').value.trim();
+  const missingAge  = document.getElementById('missing-age').value.trim();
+  const district    = document.getElementById('of-district').value;
+  const location    = document.getElementById('missing-location').value.trim();
+  const desc        = document.getElementById('missing-desc').value.trim();
+
+  if (!missingName || !missingAge || !district) {
+    toast('Name, Age, and District are required', 'error'); return;
+  }
+
+  const file = document.getElementById('photo-input').files[0];
+
+  const finalize = (photo) => {
+    const caseObj = {
+      id:           Date.now(),
+      officerName:  currentOfficer.name,
+      officerCode:  currentOfficer.code,
+      officerMobile:currentOfficer.mobile,
+      designation:  currentOfficer.designation,
+      district,
+      missingName,
+      missingAge,
+      location:    location || 'Unknown',
+      description: desc     || '—',
+      photo,
+      createdAt: new Date().toLocaleString()
+    };
+
+    allCases.push(caseObj);
+    saveCases();
+
+    // Try to POST to Flask backend
+    fetch('http://127.0.0.1:5000/add-case', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        officerName: caseObj.officerName,
+        designation: caseObj.designation,
+        code:        caseObj.officerCode,
+        mobile:      caseObj.officerMobile,
+        missingName, missingAge
+      })
+    }).catch(() => {});
+
+    // Auto-download case log
+    const log = [
+      'ROADWATCH — Missing Person Case Log',
+      '─'.repeat(40),
+      `Officer:     ${currentOfficer.name} (${currentOfficer.designation})`,
+      `Code:        ${currentOfficer.code}`,
+      `Mobile:      ${currentOfficer.mobile}`,
+      `District:    ${district}`,
+      '',
+      `Missing:     ${missingName}`,
+      `Age:         ${missingAge}`,
+      `Last Seen:   ${location || 'Unknown'}`,
+      `Description: ${desc || '—'}`,
+      '',
+      `Filed At:    ${caseObj.createdAt}`
+    ].join('\n');
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([log], { type: 'text/plain' }));
+    a.download = `Case_${currentOfficer.code}_${missingName.replace(/\s+/g, '_')}.txt`;
+    a.click();
+
+    // Reset form fields
+    ['missing-name','missing-age','missing-location','missing-desc']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('photo-input').value = '';
+    document.getElementById('preview-img').style.display = 'none';
+
+    toast(`Case for "${missingName}" saved!`, 'success');
+    renderOfficerCases();
+  };
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => finalize(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    finalize(null);
+  }
+}
+
+// ─── Render officer's own cases ──────────────────────────────
+function renderOfficerCases() {
+  const container = document.getElementById('officer-case-list');
+  const mine = allCases.filter(c => c.officerCode === currentOfficer.code);
+
+  if (!mine.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No cases filed yet</p></div>';
+    return;
+  }
+
+  container.innerHTML = mine.map((c, i) => `
+    <div class="case-list-item" style="animation-delay:${i * 0.05}s">
+      <div class="cli-avatar">👤</div>
+      <div class="cli-info">
+        <div class="cli-name">${c.missingName}</div>
+        <div class="cli-sub">Age ${c.missingAge} · ${c.district} · Last seen: ${c.location}</div>
+      </div>
+      <div class="cli-badge">Missing</div>
+    </div>
+  `).join('');
+}
+
+// ─── Public: filter & render cases ──────────────────────────
+function filterCases() {
+  const search   = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const district = document.getElementById('district-filter')?.value || '';
+  const grid     = document.getElementById('public-cases-grid');
+
+  const filtered = allCases.filter(c =>
+    (!search   || c.missingName.toLowerCase().includes(search)) &&
+    (!district || c.district === district)
+  );
+
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="icon">${allCases.length ? '🔍' : '📭'}</div>
+        <p>${allCases.length
+          ? 'No results for these filters.'
+          : 'No records yet. Officers can add cases via the Officer Portal.'}</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((c, i) => `
+    <div class="case-card" style="animation-delay:${i * 0.06}s">
+      ${c.photo
+        ? `<img class="case-card-img" src="${c.photo}" alt="${c.missingName}">`
+        : `<div class="case-card-placeholder">👤</div>`}
+      <div class="case-card-body">
+        <div class="case-status">Missing</div>
+        <div class="case-name">${c.missingName}</div>
+        <div class="case-meta">
+          <strong>Age:</strong> ${c.missingAge} years<br>
+          <strong>Last seen:</strong> ${c.location}
+          ${c.description !== '—' ? `<br><strong>Description:</strong> ${c.description}` : ''}
+        </div>
+        <div class="case-footer">
+          <div class="case-district">📍 ${c.district}</div>
+          <div class="case-officer">Filed by ${c.officerName}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── Init ────────────────────────────────────────────────────
+document.getElementById('stat-cases').textContent = allCases.length;
 </script>
-
 </body>
 </html>

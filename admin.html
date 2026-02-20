@@ -98,6 +98,25 @@ function verifyAndSave(){
     const missingName = document.getElementById("missingName").value.trim();
     const missingAge = document.getElementById("missingAge").value.trim();
     const photoInput = document.getElementById("photo");
+    fetch("http://127.0.0.1:5000/add-case", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        officerName,
+        designation,
+        code,
+        mobile,
+        missingName,
+        missingAge
+    })
+})
+.then(res => res.json())
+.then(data => {
+    alert("Saved to Firebase via Python ✅");
+})
+.catch(err => console.error(err));
 
     if(!officerName || !designation || !code || !mobile || !missingName || !missingAge){
         alert("Please fill all fields");
