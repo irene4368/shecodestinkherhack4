@@ -1,13 +1,19 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import firebase_admin
 from firebase_admin import credentials, firestore
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 # Initialize Firebase
-cred = credentials.Certificate("roadwatch-firebase-adminsdk.json")
+import json
+cred_dict = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
+cred = credentials.Certificate(cred_dict)
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
