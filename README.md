@@ -13,7 +13,7 @@
 - Member 2: [ADHEENA LAIJU] - [SCMS SCHOOL OF ENGINEERING]
 
 ### Hosted Project Link
-https://irene4368.github.io/she-codes-tinkherhack-4.0/
+https://irene4368.github.io/shecodestinkherhack4/
 
 ### Project Description
 [*RoadWatch* is a web-based AI-powered alert system that helps locate missing persons by activating on-road workers like delivery and auto drivers. It generates smart, area-specific alerts with spotting tips to enable faster community response during critical early hours.]
