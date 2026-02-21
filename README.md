@@ -51,8 +51,7 @@ List the key features of your project:
 - Feature 2: [2. *On-The-Road Mode Activation*
    Allows delivery drivers and auto drivers to activate alert mode while traveling.]
 - Feature 3: [3. *AI-Generated Alert Messages*
-   Uses *Gemini* to generate smart, high-priority alerts with spotting tips.
-]
+   Uses *Gemini* to generate smart, high-priority alerts with spotting tips.]
 - Feature 4: [4. *Cloud-Based Data Storage (Demo)*
    Missing person data is stored in Firebase and fetched dynamically
 
@@ -63,22 +62,37 @@ List the key features of your project:
 ### For Software:
 
 #### Installation
-```bash
-[Installation commands - e.g., npm install, pip install -r requirements.txt]
-```
+# Clone the repository
+git clone https://github.com/YOUR-USERNAME/roadwatch.git
+cd roadwatch
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Requirements include:
+# Flask, flask-cors, firebase-admin
 
 #### Run
-```bash
-[Run commands - e.g., npm start, python app.py]
+# Start the Flask backend
+python app.py
+
+# The server runs at http://127.0.0.1:5000
+# Open index.html directly in your browser
+# OR visit the hosted GitHub Pages link
 ```
 
+---
+
 ### For Hardware:
+*This is a software-only project. No hardware components required.*
 
 #### Components Required
-[List all components needed with specifications]
+- A computer or smartphone with a modern web browser (Chrome, Firefox, Edge)
+- Internet connection (for Google Fonts and Firebase sync)
+- Firebase project (Firestore database — free tier)
 
 #### Circuit Setup
-[Explain how to set up the circuit]
+*Not applicable — this is a purely web-based software project.*
 
 ---
 
@@ -88,38 +102,85 @@ List the key features of your project:
 
 #### Screenshots (Add at least 3)
 
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/file/d/1_znwL66Xd2e9OMtfoHOs0LXNMpR6_UGL/view?usp=drive_link
+This is the code of the website
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/file/d/1_znwL66Xd2e9OMtfoHOs0LXNMpR6_UGL/view?usp=drive_link
+this shows the interface after main page
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/file/d/1_znwL66Xd2e9OMtfoHOs0LXNMpR6_UGL/view?usp=drive_link
+This shows the main page
 
 #### Diagrams
 
 **System Architecture:**
 
 ![Architecture Diagram](docs/architecture.png)
-*Explain your system architecture - components, data flow, tech stack interaction*
+```
+┌─────────────────────────────────────────────────────┐
+│                   USER BROWSER                      │
+│                                                     │
+│  ┌───────────┐  ┌──────────────┐  ┌───────────────┐ │
+│  │  Officer  │  │    Public    │  │   Transport   │ │
+│  │  Portal   │  │    Search    │  │  Alert Portal │ │
+│  └─────┬─────┘  └──────┬───────┘  └───────┬───────┘ │
+│        │               │                  │         │
+│        └───────────────┼──────────────────┘         │
+│                        │                            │
+│              localStorage (browser)                 │
+└────────────────────────┼────────────────────────────┘
+                         │ fetch (optional)
+                         ▼
+              ┌──────────────────┐
+              │  Flask Backend   │
+              │   (app.py)       │
+              │  Python + CORS   │
+              └────────┬─────────┘
+                       │
+                       ▼
+              ┌──────────────────┐
+              │  Firebase        │
+              │  Firestore DB    │
+              │(cases collection)│
+              └──────────────────┘
+```
+*The frontend is a single HTML file with three portals. Data is stored in browser localStorage for instant offline use, and optionally synced to Firebase Firestore via the Flask backend.*
 
 **Application Workflow:**
 
 ![Workflow](docs/workflow.png)
-*Add caption explaining your workflow*
-
+```
+Officer Registers/Logs In
+        │
+        ▼
+Files Missing Person Case
+(Name, Age, Photo, Location, District)
+        │
+        ▼
+System Auto-assigns Urgency
+  Age < 18 or > 75 → 🔴 HIGH
+  Others           → 🟡 MEDIUM
+        │
+        ├──────────────────────────────────┐
+        ▼                                  ▼
+Case saved to localStorage         POST to Firebase
+(instant, works offline)           via Flask backend
+        │
+        ├─────────────────┬────────────────────────┐
+        ▼                 ▼                         ▼
+  Public Search    Transport Workers          Officer sees
+  can find the     in that district           case in their
+  person by        see the alert with         filed cases
+  name/district    photo + officer            list
+                   contact number
 ---
 
-### For Hardware:
-
-#### Schematic & Circuit
-
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
+For Hardware:
+Not applicable — RoadWatch is a software-only web application.
+Schematic & Circuit
+No circuit or hardware components used in this project.
+Build Photos
+No physical build — this is a web application hosted on GitHub Pages.
 
 #### Build Photos
 
@@ -147,36 +208,38 @@ List the key features of your project:
 ##### Endpoints
 
 **GET /api/endpoint**
-- **Description:** [What it does]
-- **Parameters:**
-  - `param1` (string): [Description]
-  - `param2` (integer): [Description]
-- **Response:**
-```json
-{
-  "status": "success",
-  "data": {}
-}
-```
+Description: Fetches all missing person cases stored in Firebase Firestore
+Parameters: None
+Response:
+[
+  {
+    "id": "abc123",
+    "officerName": "Rajesh Kumar",
+    "designation": "Constable",
+    "code": "KL001",
+    "mobile": "9876543210",
+    "missingName": "Arun Raj",
+    "missingAge": "12",
+    "district": "Thrissur"
+  }
+]
 
 **POST /api/endpoint**
-- **Description:** [What it does]
+- **Description:**  Saves a new missing person case filed by a police officer into Firebase Firestore
 - **Request Body:**
-```json
 {
-  "field1": "value1",
-  "field2": "value2"
+  "officerName": "Rajesh Kumar",
+  "designation": "Constable",
+  "code": "KL001",
+  "mobile": "9876543210",
+  "missingName": "Arun Raj",
+  "missingAge": "12"
 }
-```
 - **Response:**
-```json
 {
-  "status": "success",
-  "message": "Operation completed"
+  "message": "Case saved successfully!"
 }
-```
 
-[Add more endpoints as needed...]
 
 ---
 
@@ -366,9 +429,10 @@ python script.py -v --format json data.json
 ## Project Demo
 
 ### Video
-[Add your demo video link here - YouTube, Google Drive, etc.]
+https://drive.google.com/file/d/1bugpIJlkijUEblf8ZO2XPPIP835ovR-d/view?usp=drive_link
+This shows the proper workflow of the working of website from main page to sub pages. From officer and transport controls to logins and registers
 
-*Explain what the video demonstrates - key features, user flow, technical highlights*
+
 
 ### Additional Demos
 [Add any extra demo materials/links - Live site, APK download, online demo, etc.]
