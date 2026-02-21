@@ -19,7 +19,7 @@
 [*RoadWatch* is a web-based AI-powered alert system that helps locate missing persons by activating on-road workers like delivery and auto drivers. It generates smart, area-specific alerts with spotting tips to enable faster community response during critical early hours.]
 
 ### The Problem statement
-[The missing reports once filed are shown in the newspapers which people rarely read thus wasting precious time when someone is missing thus an app which notifies the transport workers who are always on the  road to receive high alerts of missing person and keep th]
+[The missing reports once filed are shown in the newspapers which people rarely read thus wasting precious time when someone is missing thus an app which notifies the transport workers who are always on the  road to receive high alerts of missing person and keep the public on high alert.]
 
 ### The Solution
 [Develop an AI-powered web system that instantly generates area-specific missing person alerts and activates high-visibility road workers like delivery and auto drivers through an “On-The-Road Mode.” This enables faster information spread, structured community participation, and quicker response during the critical early hours of a missing case.]
