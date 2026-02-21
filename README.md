@@ -19,7 +19,7 @@
 [*RoadWatch* is a web-based AI-powered alert system that helps locate missing persons by activating on-road workers like delivery and auto drivers. It generates smart, area-specific alerts with spotting tips to enable faster community response during critical early hours.]
 
 ### The Problem statement
-[The missing reports once filed are shown in the newspapers which people rarely read thus wasting precious time when someone is missing thus an app which notifies the transport workers who are always on the  road to receive high alerts of missing person and keep the public on high alert.]
+[The missing reports once filed are shown in the newspapers which people rarely read thus wasting precious time when someone is missing thus an app which notifies the transport workers who are always on the  road to receive high alerts of missing person and keep th]
 
 ### The Solution
 [Develop an AI-powered web system that instantly generates area-specific missing person alerts and activates high-visibility road workers like delivery and auto drivers through an “On-The-Road Mode.” This enables faster information spread, structured community participation, and quicker response during the critical early hours of a missing case.]
@@ -31,25 +31,30 @@
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
+- Languages used: [HTML,CSS,JavaScript,Firebase]
 - Frameworks used: [e.g., React, Django, Spring Boot]
 - Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+- Tools used: [ VS Code, Git]
 
 **For Hardware:**
-- Main components: [List main components]
+- Main components: [Laptop,internet connection]
 - Specifications: [Technical specifications]
-- Tools required: [List tools needed]
+- Tools required: [web browser,vs code ,al tool like gemini]
 
 ---
 
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1: [1. *Area-Based Selection*
+   Users can select a specific area to view relevant missing person cases.]
+- Feature 2: [2. *On-The-Road Mode Activation*
+   Allows delivery drivers and auto drivers to activate alert mode while traveling.]
+- Feature 3: [3. *AI-Generated Alert Messages*
+   Uses *Gemini* to generate smart, high-priority alerts with spotting tips.
+]
+- Feature 4: [4. *Cloud-Based Data Storage (Demo)*
+   Missing person data is stored in Firebase and fetched dynamically
 
 ---
 
