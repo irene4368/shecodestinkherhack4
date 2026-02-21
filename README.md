@@ -51,8 +51,7 @@ List the key features of your project:
 - Feature 2: [2. *On-The-Road Mode Activation*
    Allows delivery drivers and auto drivers to activate alert mode while traveling.]
 - Feature 3: [3. *AI-Generated Alert Messages*
-   Uses *Gemini* to generate smart, high-priority alerts with spotting tips.
-]
+   Uses *Gemini* to generate smart, high-priority alerts with spotting tips.]
 - Feature 4: [4. *Cloud-Based Data Storage (Demo)*
    Missing person data is stored in Firebase and fetched dynamically
 
@@ -63,24 +62,37 @@ List the key features of your project:
 ### For Software:
 
 #### Installation
-```bash
-[Installation commands - e.g., npm install, pip install -r requirements.txt]
-```
+bash
+# Clone the repository
+git clone https://github.com/YOUR-USERNAME/roadwatch.git
+cd roadwatch
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Requirements include:
+# Flask, flask-cors, firebase-admin
+
 
 #### Run
-```bash
-[Run commands - e.g., npm start, python app.py]
-```
+bash
+# Start the Flask backend
+python app.py
+
+# The server runs at http://127.0.0.1:5000
+# Open index.html directly in your browser
+# OR visit the hosted GitHub Pages link
 
 ### For Hardware:
+This is a software-only project. No hardware components required.
 
 #### Components Required
-[List all components needed with specifications]
+- A computer or smartphone with a modern web browser (Chrome, Firefox, Edge)
+- Internet connection (for Google Fonts and Firebase sync)
+- Firebase project (Firestore database — free tier)
 
 #### Circuit Setup
-[Explain how to set up the circuit]
-
----
+Not applicable — this is a purely web-based software project.
 
 ## Project Documentation
 
@@ -99,27 +111,80 @@ List the key features of your project:
 
 #### Diagrams
 
-**System Architecture:**
+*System Architecture:*
 
 ![Architecture Diagram](docs/architecture.png)
-*Explain your system architecture - components, data flow, tech stack interaction*
 
-**Application Workflow:**
+
+┌─────────────────────────────────────────────────────┐
+│                   USER BROWSER                      │
+│                                                     │
+│  ┌───────────┐  ┌──────────────┐  ┌───────────────┐ │
+│  │  Officer  │  │    Public    │  │   Transport   │ │
+│  │  Portal   │  │    Search    │  │  Alert Portal │ │
+│  └─────┬─────┘  └──────┬───────┘  └───────┬───────┘ │
+│        │               │                  │         │
+│        └───────────────┼──────────────────┘         │
+│                        │                            │
+│              localStorage (browser)                 │
+└────────────────────────┼────────────────────────────┘
+                         │ fetch (optional)
+                         ▼
+              ┌──────────────────┐
+              │  Flask Backend   │
+              │   (app.py)       │
+              │  Python + CORS   │
+              └────────┬─────────┘
+                       │
+                       ▼
+              ┌──────────────────┐
+              │  Firebase        │
+              │  Firestore DB    │
+              │(cases collection)│
+              └──────────────────┘
+
+The frontend is a single HTML file with three portals. Data is stored in browser localStorage for instant offline use, and optionally synced to Firebase Firestore via the Flask backend.
+
+*Application Workflow:*
 
 ![Workflow](docs/workflow.png)
-*Add caption explaining your workflow*
 
+
+Officer Registers/Logs In
+        │
+        ▼
+Files Missing Person Case
+(Name, Age, Photo, Location, District)
+        │
+        ▼
+System Auto-assigns Urgency
+  Age < 18 or > 75 → 🔴 HIGH
+  Others           → 🟡 MEDIUM
+        │
+        ├──────────────────────────────────┐
+        ▼                                  ▼
+Case saved to localStorage         POST to Firebase
+(instant, works offline)           via Flask backend
+        │
+        ├─────────────────┬────────────────────────┐
+        ▼                 ▼                         ▼
+  Public Search    Transport Workers          Officer sees
+  can find the     in that district           case in their
+  person by        see the alert with         filed cases
+  name/district    photo + officer            list
+                   contact number
+
+When a case is filed, it is immediately available to the Public Search portal and the Transport Alert Network, filtered by district and sorted by urgency (HIGH first).
 ---
 
 ### For Hardware:
+Not applicable — RoadWatch is a software-only web application.
 
 #### Schematic & Circuit
+No circuit or hardware components used in this project.
 
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
+#### Build Photos
+No physical build — this is a web application hosted on GitHub Pages.
 
 #### Build Photos
 
